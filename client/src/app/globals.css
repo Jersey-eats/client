@@ -1,0 +1,191 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Jersey Eats — brand tokens (from Brand Guidelines §3)
+   Visual direction: K × O × L
+   ============================================================ */
+
+:root {
+  /* Primary blues */
+  --je-blue: #5BC0DE;
+  --je-blue-dark: #2A9DC2;
+  --je-blue-navy: #1B6E8A;
+
+  /* Secondary greens */
+  --je-green: #4CAF50;
+  --je-green-light: #81C784;
+  --je-green-dark: #2E7D32;
+
+  /* Secondary browns / warm */
+  --je-brown: #C68642;
+  --je-brown-light: #DEB887;
+  --je-brown-dark: #8B5E3C;
+  --je-tan: #F5D5B0;
+  --je-tan-soft: #FAE8D2;
+  --je-cream: #FFF5E6;
+
+  /* Accents */
+  --je-coral: #FF6B6B;
+  --je-coral-soft: #FFBFBF;
+  --je-amber: #F59E0B;
+
+  /* Neutrals */
+  --je-charcoal: #2D2D2D;
+  --je-grey-mid: #6B7280;
+  --je-grey-light: #E5E7EB;
+  --je-white: #FFFFFF;
+  --je-off-white: #F7F9FA;
+
+  /* K × O × L working tokens — cool-tinted after pivot to blue-led palette */
+  --ink: #141A1E;              /* faintly cool near-black */
+  --paper: #F6FAFC;            /* cool pale blue-white (was warm #FBF8F3) */
+  --line: #DCE5EB;             /* cool light border (was warm #E8E2D9) */
+  --mist: #EDF5F9;             /* cool cream-replacement — subtle blue mist background */
+  --accent: #1B6E8A;           /* primary brand accent, per user direction */
+
+  /* Surfaces */
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.2, 0.9, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast: 150ms;
+  --dur-base: 250ms;
+  --dur-slow: 400ms;
+
+  /* Radius */
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 18px;
+  --r-pill: 999px;
+}
+
+@theme inline {
+  /* Colour tokens → Tailwind utilities (e.g. bg-je-blue, text-ink) */
+  --color-je-blue: var(--je-blue);
+  --color-je-blue-dark: var(--je-blue-dark);
+  --color-je-blue-navy: var(--je-blue-navy);
+  --color-je-green: var(--je-green);
+  --color-je-green-light: var(--je-green-light);
+  --color-je-green-dark: var(--je-green-dark);
+  --color-je-brown: var(--je-brown);
+  --color-je-brown-light: var(--je-brown-light);
+  --color-je-brown-dark: var(--je-brown-dark);
+  --color-je-tan: var(--je-tan);
+  --color-je-tan-soft: var(--je-tan-soft);
+  --color-je-cream: var(--je-cream);
+  --color-je-coral: var(--je-coral);
+  --color-je-coral-soft: var(--je-coral-soft);
+  --color-je-amber: var(--je-amber);
+  --color-je-charcoal: var(--je-charcoal);
+  --color-je-grey-mid: var(--je-grey-mid);
+  --color-je-grey-light: var(--je-grey-light);
+  --color-je-off-white: var(--je-off-white);
+
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --color-line: var(--line);
+  --color-mist: var(--mist);
+  --color-accent: var(--accent);
+
+  /* Fonts (provided by next/font in layout.tsx) */
+  --font-sans: var(--font-inter), "Helvetica Neue", Arial, sans-serif;
+  --font-serif: var(--font-fraunces), Georgia, "Times New Roman", serif;
+
+  /* Radius scale */
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+  --radius-pill: var(--r-pill);
+}
+
+/* ------------------------------------------------------------
+   Base
+   ------------------------------------------------------------ */
+html, body {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+body {
+  font-family: var(--font-sans);
+  font-feature-settings: "cv11", "ss01";
+  letter-spacing: -0.005em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: var(--je-blue);
+  color: var(--ink);
+}
+
+/* ------------------------------------------------------------
+   Utilities
+   ------------------------------------------------------------ */
+
+/* Fraunces italic accent — use on words to highlight */
+.serif-em,
+.em {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 500;
+}
+
+/* Atmospheric blob — used in hero backgrounds */
+.je-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  pointer-events: none;
+}
+
+/* Noise overlay for premium texture */
+.je-noise::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.08 0 0 0 0 0.05 0 0 0 0.35 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  opacity: 0.06;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Reveal-on-load stagger (used across hero) */
+@keyframes je-rise {
+  from { opacity: 0; transform: translate3d(0, 14px, 0); }
+  to   { opacity: 1; transform: none; }
+}
+.je-rise {
+  animation: je-rise 650ms var(--ease-out) both;
+}
+
+@keyframes je-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.je-fade {
+  animation: je-fade 800ms var(--ease-out) both;
+}
+
+/* Pulse dot */
+@keyframes je-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.55; transform: scale(0.85); }
+}
+.je-pulse {
+  animation: je-pulse 2s ease-in-out infinite;
+}
+
+/* Scrollbar hide for filter rows */
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Focus ring (accessibility) */
+:where(button, a, input, select, textarea):focus-visible {
+  outline: 2px solid var(--je-blue-dark);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
