@@ -11,7 +11,7 @@ import type { UserProfile, SavedAddress } from "../types";
  * All calls return resolved Promises so UI code is future-proof.
  */
 
-let currentUser: UserProfile | null = MOCK_USER; // signed in by default in demo
+let currentUser: UserProfile | null = null;
 
 export async function getCurrentUser(): Promise<UserProfile | null> {
   return currentUser;
@@ -22,8 +22,9 @@ export async function isSignedIn(): Promise<boolean> {
 }
 
 /** @backend supabase.auth.signInWithPassword */
-export async function signInWithEmail(_email: string, _password: string): Promise<UserProfile> {
-  currentUser = MOCK_USER;
+export async function signInWithEmail(email: string, _password: string): Promise<UserProfile> {
+  // Demo credentials: demo@jerseyeats.je / demo1234
+  currentUser = { ...MOCK_USER, email };
   return currentUser;
 }
 

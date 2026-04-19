@@ -40,7 +40,7 @@ export function Hero() {
           className="mt-6 sm:mt-7 text-[15px] sm:text-[17px] leading-relaxed text-je-charcoal/75 max-w-[480px] mx-auto je-rise"
           style={{ animationDelay: "200ms" }}
         >
-          30+ island kitchens across all 12 parishes. Pick where you are — we'll show you what's open tonight.
+          30+ island kitchens across all 12 parishes. Pick where you are — we'll show you what's open today.
         </p>
 
         <div className="relative z-40 mt-9 sm:mt-10 je-rise" style={{ animationDelay: "280ms" }}>

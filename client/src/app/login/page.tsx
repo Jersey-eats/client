@@ -6,6 +6,7 @@ import { useState } from "react";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { SocialButtons } from "@/components/auth/SocialButtons";
 import { signInWithEmail } from "@/lib/data/services/auth";
+import { useAuth } from "@/lib/store/auth";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -16,7 +17,8 @@ export default function LoginPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
-    await signInWithEmail(email, password);
+    const user = await signInWithEmail(email, password);
+    useAuth.getState().setUser(user);
     router.push("/account");
   };
 

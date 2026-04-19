@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { useParish } from "@/lib/store/parish";
 import { parishName } from "@/lib/data/services/parishes";
 import { NavParishPicker } from "./NavParishPicker";
+import { useAuth } from "@/lib/store/auth";
 
 /**
  * L-style two-zone minimal nav on cream backdrop with blur.
@@ -18,6 +19,7 @@ export function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const parish = useParish((s) => s.parish);
+  const user = useAuth((s) => s.user);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -44,15 +46,25 @@ export function Nav() {
 
         <nav className="hidden md:flex items-center gap-5 text-[13px] font-medium text-je-charcoal">
           <Link href="/r" className="hover:text-ink transition-colors">Restaurants</Link>
-          <Link href="/account/orders" className="hover:text-ink transition-colors">Orders</Link>
+          {user && <Link href="/account/orders" className="hover:text-ink transition-colors">Orders</Link>}
           <Link href="/#help" className="hover:text-ink transition-colors">Help</Link>
-          <Link
-            href="/login"
-            className="inline-flex items-center gap-2 rounded-full border border-ink px-4 py-2 text-[13px] font-medium text-ink hover:bg-ink hover:text-paper transition-colors"
-          >
-            <User className="size-3.5" />
-            Sign in
-          </Link>
+          {user ? (
+            <Link
+              href="/account"
+              className="inline-flex items-center gap-2 rounded-full border border-ink px-4 py-2 text-[13px] font-medium text-ink hover:bg-ink hover:text-paper transition-colors"
+            >
+              <User className="size-3.5" />
+              {user.name.split(" ")[0]}
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              className="inline-flex items-center gap-2 rounded-full border border-ink px-4 py-2 text-[13px] font-medium text-ink hover:bg-ink hover:text-paper transition-colors"
+            >
+              <User className="size-3.5" />
+              Sign in
+            </Link>
+          )}
         </nav>
 
         <button
@@ -93,8 +105,8 @@ export function Nav() {
             )}
             <nav className="flex flex-col gap-1.5 text-[17px] font-semibold text-ink mt-2">
               <Link href="/r" onClick={() => setMobileOpen(false)} className="py-2">Restaurants</Link>
-              <Link href="/account/orders" onClick={() => setMobileOpen(false)} className="py-2">Orders</Link>
-              <Link href="/account" onClick={() => setMobileOpen(false)} className="py-2">Account</Link>
+              {user && <Link href="/account/orders" onClick={() => setMobileOpen(false)} className="py-2">Orders</Link>}
+              {user && <Link href="/account" onClick={() => setMobileOpen(false)} className="py-2">Account</Link>}
               <Link href="/#help" onClick={() => setMobileOpen(false)} className="py-2">Help</Link>
             </nav>
             <div className="mt-auto flex flex-col gap-2.5">

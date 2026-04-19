@@ -1,21 +1,24 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { getOrders } from "@/lib/data/services/orders";
-import { getCurrentUser } from "@/lib/data/services/auth";
+import { useAuth } from "@/lib/store/auth";
 import { formatPrice, formatRelative } from "@/lib/utils";
+import type { Order } from "@/lib/data/types";
 
-/**
- * Server component — pulls recent orders from the service layer.
- * Only rendered for signed-in users (per UX playbook §2.1 — returning-visitor shortcut).
- */
-export async function RecentOrders() {
-  const user = await getCurrentUser();
-  if (!user) return null;
+export function RecentOrders() {
+  const user = useAuth((s) => s.user);
+  const [orders, setOrders] = useState<Order[]>([]);
 
-  const orders = await getOrders();
-  const recent = orders.slice(0, 3);
-  if (recent.length === 0) return null;
+  useEffect(() => {
+    if (!user) return;
+    getOrders().then((all) => setOrders(all.slice(0, 3)));
+  }, [user]);
+
+  if (!user || orders.length === 0) return null;
 
   return (
     <section className="bg-paper border-t border-line py-12 sm:py-14">
@@ -37,7 +40,7 @@ export async function RecentOrders() {
           </Link>
         </div>
         <ul className="flex gap-3.5 overflow-x-auto no-scrollbar -mx-5 px-5 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-3">
-          {recent.map((o) => (
+          {orders.map((o) => (
             <li
               key={o.id}
               className="shrink-0 w-[280px] sm:w-auto rounded-[var(--r-md)] border border-line bg-white hover:border-ink transition-colors overflow-hidden"

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { LogOut, Trash2, ShieldAlert } from "lucide-react";
 import { changePassword, deleteAccount, signOut } from "@/lib/data/services/auth";
+import { useAuth } from "@/lib/store/auth";
 
 export function SecurityPanel() {
   const router = useRouter();
@@ -52,6 +53,7 @@ export function SecurityPanel() {
           type="button"
           onClick={async () => {
             await signOut();
+            useAuth.getState().clear();
             router.push("/");
           }}
           className="inline-flex items-center gap-2 rounded-full border border-ink px-5 py-2.5 text-[13px] font-semibold"

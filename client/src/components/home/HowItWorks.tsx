@@ -52,14 +52,6 @@ export function HowItWorks() {
                 {s.title}
               </h3>
               <p className="text-[13px] text-je-charcoal/75 leading-relaxed">{s.copy}</p>
-              {i < STEPS.length - 1 && (
-                <div
-                  aria-hidden
-                  className="hidden md:block absolute top-1/2 -right-2.5 -translate-y-1/2 size-5 rounded-full bg-paper border border-line text-je-grey-mid items-center justify-center text-[10px] flex"
-                >
-                  →
-                </div>
-              )}
             </li>
           ))}
         </ol>

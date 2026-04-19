@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { Apple } from "lucide-react";
 import { signInWithProvider } from "@/lib/data/services/auth";
+import { useAuth } from "@/lib/store/auth";
 
 /**
  * Social sign-in buttons per brand voice — Google one-tap first, Apple second,
@@ -11,7 +12,8 @@ import { signInWithProvider } from "@/lib/data/services/auth";
 export function SocialButtons({ redirect = "/account" }: { redirect?: string }) {
   const router = useRouter();
   const go = async (p: "google" | "apple" | "facebook") => {
-    await signInWithProvider(p);
+    const user = await signInWithProvider(p);
+    useAuth.getState().setUser(user);
     router.push(redirect);
   };
   return (
