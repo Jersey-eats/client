@@ -42,6 +42,8 @@
   --line: #DCE5EB;             /* cool light border (was warm #E8E2D9) */
   --mist: #EDF5F9;             /* cool cream-replacement — subtle blue mist background */
   --accent: #1B6E8A;           /* primary brand accent, per user direction */
+  --logo-fill: #5DBBD7;        /* fills the big circle + letter accents in the Jersey Eats mark */
+  --modal-bg: hsl(0 0% 97%);   /* neutral grey — used on every modal/drawer, never theme-tinted */
 
   /* Surfaces */
   --surface: #ffffff;
@@ -59,6 +61,69 @@
   --r-md: 14px;
   --r-lg: 18px;
   --r-pill: 999px;
+}
+
+/* ============================================================
+   Theme variants (demo-only switcher) — override the accent
+   trio + background tints. All other tokens stay constant so
+   status colours, ink, and neutrals remain stable.
+   ============================================================ */
+
+/* ─── Green — Emerald (vibrant, food-tech) ─── */
+[data-theme="green"] {
+  --je-blue: #7AE2A8;       /* fresh mint — backgrounds / soft pills */
+  --je-blue-dark: #00BB55;  /* emerald — italic em accent */
+  --je-blue-navy: #007035;  /* deep emerald — text / icons (≈7.38:1) */
+  --mist: #E8F6EE;
+  --paper: #F5FBF7;
+  --line: #D2E6D9;
+  --accent: #007035;
+  --logo-fill: #00BB55;
+}
+
+/* ─── Green — Forest (earthy, premium, slow-food) ─── */
+[data-theme="forest"] {
+  --je-blue: #95D5B2;       /* soft spring — backgrounds / pills */
+  --je-blue-dark: #2D6A4F;  /* forest green — italic em accent */
+  --je-blue-navy: #1B4332;  /* deep pine — text / icons (≈10.5:1) */
+  --mist: #E8F2ED;
+  --paper: #F5FAF7;
+  --line: #D0DFD5;
+  --accent: #1B4332;
+  --logo-fill: #2D6A4F;
+}
+
+/* ─── Green — Lime (bright, fresh, yellow-leaning) ─── */
+[data-theme="lime"] {
+  --je-blue: #BEF264;       /* light lime — backgrounds / pills */
+  --je-blue-dark: #65A30D;  /* lime — italic em accent */
+  --je-blue-navy: #365314;  /* dark olive — text / icons (≈8.9:1) */
+  --mist: #F5F9E8;
+  --paper: #FAFBF3;
+  --line: #DFE4C8;
+  --accent: #365314;
+  --logo-fill: #65A30D;
+}
+
+/* ============================================================
+   Typography variants (demo-only switcher) — override the sans
+   font family on root + .font-sans utility. Fraunces (.font-serif)
+   is unaffected because it has its own explicit font-family rule.
+   ============================================================ */
+
+[data-typography="montserrat"],
+[data-typography="montserrat"] .font-sans {
+  font-family: var(--font-montserrat), "Helvetica Neue", Arial, sans-serif;
+}
+
+[data-typography="jakarta"],
+[data-typography="jakarta"] .font-sans {
+  font-family: var(--font-jakarta), "Helvetica Neue", Arial, sans-serif;
+}
+
+[data-typography="dm-sans"],
+[data-typography="dm-sans"] .font-sans {
+  font-family: var(--font-dm-sans), "Helvetica Neue", Arial, sans-serif;
 }
 
 @theme inline {
@@ -98,6 +163,7 @@
   --radius-md: var(--r-md);
   --radius-lg: var(--r-lg);
   --radius-pill: var(--r-pill);
+  --radius-full: var(--r-pill);  /* override Tailwind default 9999px → 999px */
 }
 
 /* ------------------------------------------------------------
@@ -131,6 +197,19 @@ body {
   font-family: var(--font-serif);
   font-style: italic;
   font-weight: 500;
+}
+
+/* Fraunces has a smaller x-height than Inter, so italic accents in
+   headings need +4px to optically match the surrounding sans text. */
+h1 .font-serif.italic,
+h2 .font-serif.italic,
+h3 .font-serif.italic,
+h4 .font-serif.italic,
+h1 .em,
+h2 .em,
+h3 .em,
+h4 .em {
+  font-size: calc(1em + 4px);
 }
 
 /* Atmospheric blob — used in hero backgrounds */
@@ -177,6 +256,18 @@ body {
 }
 .je-pulse {
   animation: je-pulse 2s ease-in-out infinite;
+}
+
+/* Horizontal auto-scrolling marquee (food strip in hero) */
+@keyframes je-marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.je-marquee-track {
+  animation: je-marquee 130s linear infinite;
+}
+.je-marquee-track:hover {
+  animation-play-state: paused;
 }
 
 /* Scrollbar hide for filter rows */

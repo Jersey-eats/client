@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Fraunces } from "next/font/google";
+import { Inter, Fraunces, Montserrat, Plus_Jakarta_Sans, DM_Sans } from "next/font/google";
 import "./globals.css";
 
 import { Nav } from "@/components/layout/Nav";
@@ -7,6 +7,15 @@ import { Footer } from "@/components/layout/Footer";
 import { BasketDrawer } from "@/components/basket/BasketDrawer";
 import { BasketStickyBar } from "@/components/basket/BasketStickyBar";
 import { Agentation } from "@/components/dev/Agentation";
+import { ThemeSwitcher } from "@/components/dev/ThemeSwitcher";
+import { TypographySwitcher } from "@/components/dev/TypographySwitcher";
+
+const bootstrap = `try{
+  var t=localStorage.getItem('je:theme');
+  if(t==='green'||t==='forest'||t==='lime')document.documentElement.setAttribute('data-theme',t);
+  var f=localStorage.getItem('je:typography');
+  if(f==='montserrat'||f==='jakarta'||f==='dm-sans')document.documentElement.setAttribute('data-typography',f);
+}catch(e){}`;
 
 const inter = Inter({
   variable: "--font-inter",
@@ -20,6 +29,27 @@ const fraunces = Fraunces({
   subsets: ["latin"],
   weight: ["400", "500"],
   style: ["italic"],
+  display: "swap",
+});
+
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+});
+
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+});
+
+const dmSans = DM_Sans({
+  variable: "--font-dm-sans",
+  subsets: ["latin"],
+  weight: ["400", "500", "700", "800"],
   display: "swap",
 });
 
@@ -48,9 +78,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${fraunces.variable}`}
+      className={`${inter.variable} ${fraunces.variable} ${montserrat.variable} ${jakarta.variable} ${dmSans.variable}`}
       suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: bootstrap }} />
+      </head>
       <body className="min-h-screen flex flex-col bg-mist text-ink antialiased">
         <Nav />
         <main className="flex-1 flex flex-col">{children}</main>
@@ -58,6 +91,8 @@ export default function RootLayout({
         <BasketStickyBar />
         <BasketDrawer />
         <Agentation />
+        <ThemeSwitcher />
+        <TypographySwitcher />
       </body>
     </html>
   );

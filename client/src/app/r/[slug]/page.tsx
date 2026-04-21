@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { Clock, MapPin, Phone, Star } from "lucide-react";
+import { CalendarClock, Clock, MapPin, Phone, Star } from "lucide-react";
 import { getRestaurantBySlug } from "@/lib/data/services/restaurants";
 import { getMenu } from "@/lib/data/services/menu";
 import { MenuBrowser } from "@/components/restaurant/MenuBrowser";
@@ -29,6 +29,22 @@ export default async function MenuPage(props: PageProps<"/r/[slug]">) {
         </div>
         <div className="mx-auto max-w-6xl px-5 sm:px-8 -mt-16 sm:-mt-20 relative z-10">
           <div className="bg-paper border border-line rounded-[var(--r-lg)] p-5 sm:p-6 shadow-[0_24px_50px_rgba(26,22,20,0.08)]">
+            {!restaurant.openNow && (
+              <div className="mb-5 rounded-[var(--r-md)] bg-je-coral/10 border border-je-coral/30 p-4 flex items-start gap-3">
+                <CalendarClock className="size-5 text-je-coral shrink-0 mt-0.5" strokeWidth={2.25} />
+                <div>
+                  <div className="text-[13px] font-semibold text-ink">
+                    Currently closed
+                  </div>
+                  <p className="mt-1 text-[12.5px] text-je-charcoal/85 leading-relaxed">
+                    Browse the menu to plan your next order — you won't be able to place one until the kitchen is open.
+                  </p>
+                  <div className="mt-2 inline-flex items-center gap-1.5 text-[12px] font-medium text-je-coral">
+                    <Clock className="size-3.5" /> {restaurant.hours}
+                  </div>
+                </div>
+              </div>
+            )}
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div className="min-w-0">
                 <div className="text-[10px] font-semibold tracking-[0.2em] uppercase text-je-blue-navy mb-2">

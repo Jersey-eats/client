@@ -42,7 +42,7 @@ export function BasketDrawer() {
           <motion.aside
             role="dialog"
             aria-label="Your basket"
-            className="absolute right-0 top-0 h-full w-full sm:max-w-[440px] bg-paper flex flex-col shadow-[-24px_0_60px_rgba(26,22,20,0.2)]"
+            className="absolute right-0 top-0 h-full w-full sm:max-w-[440px] bg-[var(--modal-bg)] flex flex-col shadow-[-24px_0_60px_rgba(26,22,20,0.2)]"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}

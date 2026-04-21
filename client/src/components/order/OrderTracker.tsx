@@ -31,16 +31,21 @@ export function OrderTracker({ status }: { status: OrderStatus }) {
 
   return (
     <ol className="relative">
-      <div className="absolute left-3 top-3 bottom-3 w-[2px] bg-line rounded-full" />
-      <div
-        className="absolute left-3 top-3 w-[2px] bg-ink rounded-full transition-all duration-700"
-        style={{ height: `calc(${(activeIdx / (STEPS.length - 1)) * 100}% - 1.5rem)` }}
-      />
       {STEPS.map((s, i) => {
         const done = i <= activeIdx;
         const isCurrent = i === activeIdx;
+        const isLast = i === STEPS.length - 1;
+        const nextDone = i + 1 <= activeIdx;
         return (
           <li key={s.key} className="relative pl-10 pb-7 last:pb-0">
+            {!isLast && (
+              <span
+                aria-hidden
+                className={`absolute left-3 top-[13px] bottom-0 w-[2px] rounded-full transition-colors duration-700 ${
+                  nextDone ? "bg-ink" : "bg-line"
+                }`}
+              />
+            )}
             <span
               className={`absolute left-0 top-0 size-[26px] rounded-full inline-flex items-center justify-center text-[10px] font-semibold transition-colors ${
                 done ? "bg-ink text-paper" : "bg-white text-je-grey-mid border border-line"

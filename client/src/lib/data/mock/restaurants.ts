@@ -81,7 +81,7 @@ export const MOCK_RESTAURANTS: Restaurant[] = [
     address: "2 Albert Quay, St Helier JE2 3NG",
     phone: "01534 345 678",
     hours: "Mon–Sat · 11:30 – 21:00",
-    openNow: true,
+    openNow: false,
     popular: true,
     deliveryZones: [
       { parish: "st_helier", feePence: 200, minOrderPence: 1000 },

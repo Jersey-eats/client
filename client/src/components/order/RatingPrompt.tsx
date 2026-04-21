@@ -54,7 +54,8 @@ export function RatingPrompt({
               className="size-9 inline-flex items-center justify-center rounded-full hover:scale-110 transition-transform"
             >
               <Star
-                className={`size-6 ${lit ? "fill-je-amber text-je-amber" : "text-je-grey-light"}`}
+                className={`size-6 ${lit ? "text-je-amber" : "text-je-grey-light"}`}
+                fill={lit ? "currentColor" : "none"}
                 strokeWidth={1.5}
               />
             </button>
@@ -78,7 +79,7 @@ export function RatingPrompt({
             }}
             className="mt-3 inline-flex items-center gap-2 rounded-full bg-ink text-paper px-5 py-2.5 text-[13px] font-medium"
           >
-            Submit rating
+            Submit
           </button>
         </div>
       )}

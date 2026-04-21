@@ -147,7 +147,7 @@ export function MenuBrowser({ restaurant, menu }: Props) {
 
       <ModifierPopup
         item={popupItem ?? { id: "", name: "", description: "", pricePence: 0, modifierGroups: [] }}
-        restaurant={{ id: restaurant.id, slug: restaurant.slug, name: restaurant.name }}
+        restaurant={{ id: restaurant.id, slug: restaurant.slug, name: restaurant.name, openNow: restaurant.openNow, hours: restaurant.hours }}
         open={popupItem != null}
         onClose={() => setPopupItem(null)}
       />

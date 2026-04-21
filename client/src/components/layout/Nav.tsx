@@ -84,7 +84,7 @@ export function Nav() {
             className="absolute inset-0 bg-ink/30 backdrop-blur-sm"
             onClick={() => setMobileOpen(false)}
           />
-          <div className="absolute right-0 top-0 h-full w-[86%] max-w-[360px] bg-mist p-6 flex flex-col gap-4 je-rise">
+          <div className="absolute right-0 top-0 h-full w-[86%] max-w-[360px] bg-[var(--modal-bg)] p-6 flex flex-col gap-4 je-rise">
             <div className="flex items-center justify-between">
               <Logo />
               <button

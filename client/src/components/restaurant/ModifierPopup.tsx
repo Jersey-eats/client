@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, Minus, Plus, X } from "lucide-react";
+import { CalendarClock, Check, Minus, Plus, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useBasket } from "@/lib/store/basket";
 import { formatPrice } from "@/lib/utils";
@@ -9,7 +9,7 @@ import type { BasketLine, MenuItem, ModifierGroup, ModifierOption } from "@/lib/
 
 interface Props {
   item: MenuItem;
-  restaurant: { id: string; slug: string; name: string };
+  restaurant: { id: string; slug: string; name: string; openNow?: boolean; hours?: string };
   open: boolean;
   onClose: () => void;
 }
@@ -86,8 +86,10 @@ export function ModifierPopup({ item, restaurant, open, onClose }: Props) {
     });
   };
 
+  const isClosed = restaurant.openNow === false;
+
   const addToBasket = () => {
-    if (!valid) return;
+    if (!valid || isClosed) return;
     const mods = item.modifierGroups.flatMap((g) =>
       (selections[g.id] ?? []).map((id) => {
         const o = g.options.find((x) => x.id === id)!;
@@ -129,7 +131,7 @@ export function ModifierPopup({ item, restaurant, open, onClose }: Props) {
           <motion.div
             role="dialog"
             aria-labelledby="modifier-title"
-            className="relative w-full sm:max-w-[520px] bg-paper rounded-t-[28px] sm:rounded-[var(--r-lg)] max-h-[92vh] flex flex-col shadow-[0_-24px_60px_rgba(26,22,20,0.25)]"
+            className="relative w-full sm:max-w-[520px] bg-[var(--modal-bg)] rounded-t-[28px] sm:rounded-[var(--r-lg)] max-h-[92vh] flex flex-col shadow-[0_-24px_60px_rgba(26,22,20,0.25)]"
             initial={{ y: "100%", opacity: 0.9 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: "100%" }}
@@ -159,6 +161,24 @@ export function ModifierPopup({ item, restaurant, open, onClose }: Props) {
             </div>
 
             <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-6">
+              {isClosed && (
+                <div className="rounded-[var(--r-md)] bg-je-coral/10 border border-je-coral/30 p-4 flex items-start gap-3">
+                  <CalendarClock className="size-5 text-je-coral shrink-0 mt-0.5" strokeWidth={2.25} />
+                  <div>
+                    <div className="text-[13px] font-semibold text-ink">
+                      Restaurant closed — ordering paused
+                    </div>
+                    <p className="mt-1 text-[12.5px] text-je-charcoal/85 leading-relaxed">
+                      You can still customise and review the item, but you won't be able to add it to your basket right now.
+                    </p>
+                    {restaurant.hours && (
+                      <div className="mt-2 text-[12px] font-medium text-je-coral">
+                        Open {restaurant.hours}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
               {item.modifierGroups.length === 0 && (
                 <p className="text-[13px] text-je-grey-mid italic font-serif">
                   No extras — just the classic.
@@ -233,10 +253,10 @@ export function ModifierPopup({ item, restaurant, open, onClose }: Props) {
               <button
                 type="button"
                 onClick={addToBasket}
-                disabled={!valid}
+                disabled={!valid || isClosed}
                 className="flex-1 inline-flex items-center justify-between gap-2 rounded-full bg-ink text-paper px-5 py-3.5 text-[14px] font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#2a221f] transition-colors"
               >
-                <span>Add to basket</span>
+                <span>{isClosed ? "Currently closed" : "Add to basket"}</span>
                 <span className="tabular-nums">{formatPrice(totalPence)}</span>
               </button>
             </footer>

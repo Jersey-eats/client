@@ -10,6 +10,9 @@ import {
 } from "@/lib/data/services/auth";
 import { MOCK_PARISHES } from "@/lib/data/mock/parishes";
 import { parishName } from "@/lib/data/services/parishes";
+import { Select } from "@/components/ui/Select";
+import { Checkbox } from "@/components/ui/Checkbox";
+import { useAuth } from "@/lib/store/auth";
 import type { ParishCode, SavedAddress, UserProfile } from "@/lib/data/types";
 
 export function ProfileEditor() {
@@ -36,6 +39,7 @@ export function ProfileEditor() {
   const saveProfile = async () => {
     const next = await updateProfile({ name: draft.name, email: draft.email, phone: draft.phone });
     setUser(next);
+    useAuth.getState().setUser(next);
     setEditing(false);
   };
 
@@ -137,7 +141,11 @@ export function ProfileEditor() {
                 </button>
                 <button
                   type="button"
-                  onClick={async () => setUser(await removeAddress(a.id))}
+                  onClick={async () => {
+                    const next = await removeAddress(a.id);
+                    setUser(next);
+                    useAuth.getState().setUser(next);
+                  }}
                   className="size-8 rounded-full border border-line inline-flex items-center justify-center hover:border-je-coral hover:text-je-coral"
                   aria-label="Remove"
                 >
@@ -161,6 +169,7 @@ export function ProfileEditor() {
           onSave={async (a) => {
             const next = await upsertAddress(a);
             setUser(next);
+            useAuth.getState().setUser(next);
             setEditingAddress(null);
           }}
         />
@@ -182,7 +191,7 @@ function AddressEditor({
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       <div className="absolute inset-0 bg-ink/40 backdrop-blur-sm" onClick={onCancel} />
-      <div className="relative w-full sm:max-w-[520px] bg-paper rounded-t-[28px] sm:rounded-[var(--r-lg)] shadow-2xl border border-line">
+      <div className="relative w-full sm:max-w-[520px] bg-[var(--modal-bg)] rounded-t-[28px] sm:rounded-[var(--r-lg)] shadow-2xl border border-line">
         <div className="p-5 sm:p-6 border-b border-line">
           <h3 className="font-sans font-bold text-[18px] tracking-[-0.015em]">
             {value.line1 ? "Edit address" : "New address"}
@@ -190,30 +199,26 @@ function AddressEditor({
         </div>
         <div className="p-5 sm:p-6 grid gap-3 sm:grid-cols-2">
           <Field label="Label" value={draft.label} onChange={(v) => setDraft({ ...draft, label: v })} />
-          <div>
-            <label className="text-[10px] uppercase tracking-[0.14em] font-semibold text-je-grey-mid">Parish</label>
-            <select
+          <label className="block">
+            <span className="text-[10px] uppercase tracking-[0.14em] font-semibold text-je-grey-mid">Parish</span>
+            <Select
               value={draft.parish}
-              onChange={(e) => setDraft({ ...draft, parish: e.target.value as ParishCode })}
-              className="mt-1 w-full rounded-[var(--r-md)] border border-line bg-white px-3.5 py-3 text-[14px]"
-            >
-              {MOCK_PARISHES.map((p) => (
-                <option key={p.code} value={p.code}>{p.name}</option>
-              ))}
-            </select>
-          </div>
+              onChange={(v) => setDraft({ ...draft, parish: v as ParishCode })}
+              options={MOCK_PARISHES.map((p) => ({ value: p.code, label: p.name }))}
+              wrapperClassName="mt-1"
+              aria-label="Parish"
+            />
+          </label>
           <Field label="Address" value={draft.line1} onChange={(v) => setDraft({ ...draft, line1: v })} className="sm:col-span-2" />
           <Field label="Postcode" value={draft.postcode ?? ""} onChange={(v) => setDraft({ ...draft, postcode: v })} />
           <Field label="Note" value={draft.note ?? ""} onChange={(v) => setDraft({ ...draft, note: v })} />
-          <label className="sm:col-span-2 flex items-center gap-2 text-[13px]">
-            <input
-              type="checkbox"
+          <div className="sm:col-span-2">
+            <Checkbox
               checked={draft.isDefault}
               onChange={(e) => setDraft({ ...draft, isDefault: e.target.checked })}
-              className="accent-ink"
+              label="Set as default"
             />
-            Set as default
-          </label>
+          </div>
         </div>
         <div className="p-5 sm:p-6 border-t border-line flex justify-end gap-2">
           <button

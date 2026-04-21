@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ArrowRight, Clock, Star } from "lucide-react";
 import { getOrders } from "@/lib/data/services/orders";
+import { getRestaurants } from "@/lib/data/services/restaurants";
 import { parishName } from "@/lib/data/services/parishes";
 import { formatPrice, formatRelative } from "@/lib/utils";
 import type { Order, OrderStatus } from "@/lib/data/types";
@@ -26,9 +27,17 @@ const STATUS_LABEL: Record<OrderStatus, string> = {
 
 export function OrderHistory() {
   const [orders, setOrders] = useState<Order[] | null>(null);
+  const [openMap, setOpenMap] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    getOrders().then(setOrders);
+    Promise.all([getOrders(), getRestaurants()]).then(([all, restaurants]) => {
+      setOrders(all);
+      const map: Record<string, boolean> = {};
+      restaurants.forEach((r) => {
+        map[r.slug] = r.openNow;
+      });
+      setOpenMap(map);
+    });
   }, []);
 
   if (!orders) {
@@ -55,64 +64,82 @@ export function OrderHistory() {
 
   return (
     <ul className="flex flex-col gap-3">
-      {orders.map((o) => (
-        <li key={o.id} className="rounded-[var(--r-lg)] border border-line bg-white p-5 hover:border-ink transition-colors">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div className="min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="font-sans font-bold text-[16px] tracking-[-0.01em]">{o.restaurantName}</h3>
-                <span
-                  className={`text-[10px] font-semibold tracking-[0.08em] uppercase px-2 py-0.5 rounded-full ${STATUS_COLOURS[o.status]}`}
-                >
-                  {STATUS_LABEL[o.status]}
-                </span>
-                {o.rating && (
-                  <span className="inline-flex items-center gap-1 text-[11px] text-je-grey-mid">
-                    <Star className="size-3 fill-je-amber text-je-amber" />
-                    {o.rating.stars}
+      {orders.map((o) => {
+        const isOpen = openMap[o.restaurantSlug] ?? true;
+        return (
+          <li key={o.id} className="rounded-[var(--r-lg)] border border-line bg-white p-5 hover:border-ink transition-colors">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="font-sans font-bold text-[16px] tracking-[-0.01em]">{o.restaurantName}</h3>
+                  <span
+                    className={`text-[10px] font-semibold tracking-[0.08em] uppercase px-2 py-0.5 rounded-full ${STATUS_COLOURS[o.status]}`}
+                  >
+                    {STATUS_LABEL[o.status]}
                   </span>
-                )}
-              </div>
-              <div className="mt-1 text-[12px] text-je-grey-mid">
-                <span className="tabular-nums font-mono">{o.orderNumber}</span>
-                <span className="mx-2">·</span>
-                {formatRelative(o.createdAt)}
-                <span className="mx-2">·</span>
-                {parishName(o.deliveryAddress.parish)}
-              </div>
-              <div className="mt-2 text-[12px] text-je-charcoal truncate max-w-[440px]">
-                {o.lines.map((l) => `${l.quantity}× ${l.itemName}`).join(" · ")}
-              </div>
-            </div>
-            <div className="flex items-start gap-3 shrink-0">
-              <div className="text-right">
-                <div className="font-sans font-bold text-[15px] tabular-nums">
-                  {formatPrice(o.totalPence)}
+                  {!isOpen && (
+                    <span className="inline-flex items-center gap-1 text-[10px] font-semibold tracking-[0.08em] uppercase px-2 py-0.5 rounded-full bg-je-coral/10 text-je-coral">
+                      <Clock className="size-2.5" strokeWidth={2.5} />
+                      Closed
+                    </span>
+                  )}
+                  {o.rating && (
+                    <span className="inline-flex items-center gap-1 text-[11px] text-je-grey-mid">
+                      <Star className="size-3 fill-je-amber text-je-amber" />
+                      {o.rating.stars}
+                    </span>
+                  )}
                 </div>
-                <div className="text-[11px] text-je-grey-mid inline-flex items-center gap-1 mt-0.5">
-                  <Clock className="size-3" />
-                  ETA{" "}
-                  {new Date(o.estimatedDeliveryAt).toLocaleTimeString("en-GB", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
+                <div className="mt-1 text-[12px] text-je-grey-mid">
+                  <span className="tabular-nums font-mono">{o.orderNumber}</span>
+                  <span className="mx-2">·</span>
+                  {formatRelative(o.createdAt)}
+                  <span className="mx-2">·</span>
+                  {parishName(o.deliveryAddress.parish)}
+                </div>
+                <div className="mt-2 text-[12px] text-je-charcoal truncate max-w-[440px]">
+                  {o.lines.map((l) => `${l.quantity}× ${l.itemName}`).join(" · ")}
                 </div>
               </div>
+              <div className="flex items-start gap-3 shrink-0">
+                <div className="text-right">
+                  <div className="font-sans font-bold text-[15px] tabular-nums">
+                    {formatPrice(o.totalPence)}
+                  </div>
+                  <div className="text-[11px] text-je-grey-mid inline-flex items-center gap-1 mt-0.5">
+                    <Clock className="size-3" />
+                    ETA{" "}
+                    {new Date(o.estimatedDeliveryAt).toLocaleTimeString("en-GB", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-          <div className="mt-3.5 pt-3.5 border-t border-line flex flex-wrap items-center justify-between gap-2">
-            <Link href={`/order/${o.id}`} className="text-[12px] font-medium text-je-grey-mid hover:text-ink">
-              View details →
-            </Link>
-            <Link
-              href={`/r/${o.restaurantSlug}`}
-              className="inline-flex items-center gap-1.5 rounded-full bg-ink text-paper px-3.5 py-1.5 text-[12px] font-semibold"
-            >
-              Reorder <ArrowRight className="size-3" />
-            </Link>
-          </div>
-        </li>
-      ))}
+            <div className="mt-3.5 pt-3.5 border-t border-line flex flex-wrap items-center justify-between gap-2">
+              <Link href={`/order/${o.id}`} className="text-[12px] font-medium text-je-grey-mid hover:text-ink">
+                View details →
+              </Link>
+              {isOpen ? (
+                <Link
+                  href={`/r/${o.restaurantSlug}`}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-ink text-paper px-3.5 py-1.5 text-[12px] font-semibold"
+                >
+                  Reorder <ArrowRight className="size-3" />
+                </Link>
+              ) : (
+                <Link
+                  href={`/r/${o.restaurantSlug}`}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-line text-je-grey-mid px-3.5 py-1.5 text-[12px] font-semibold hover:border-ink hover:text-ink transition-colors"
+                >
+                  View menu
+                </Link>
+              )}
+            </div>
+          </li>
+        );
+      })}
     </ul>
   );
 }

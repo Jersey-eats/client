@@ -7,6 +7,15 @@ import { RatingPrompt } from "@/components/order/RatingPrompt";
 import { getOrder } from "@/lib/data/services/orders";
 import { parishName } from "@/lib/data/services/parishes";
 import { formatPrice } from "@/lib/utils";
+import type { OrderStatus } from "@/lib/data/types";
+
+const STATUS_LABEL: Record<OrderStatus, string> = {
+  received: "Order placed",
+  preparing: "Preparing",
+  out_for_delivery: "On its way",
+  delivered: "Delivered",
+  cancelled: "Cancelled",
+};
 
 export const metadata = { title: "Order confirmed" };
 
@@ -26,13 +35,13 @@ export default async function OrderPage(props: PageProps<"/order/[id]">) {
         <div className="max-w-[720px]">
           <div className="inline-flex items-center gap-2 bg-je-green/15 text-je-green-dark px-3 py-1.5 rounded-full text-[11px] font-semibold tracking-[0.08em] uppercase mb-5">
             <span className="size-1.5 rounded-full bg-je-green je-pulse" />
-            Order placed
+            {STATUS_LABEL[order.status]}
           </div>
           <h1 className="font-sans font-extrabold text-[34px] sm:text-[54px] leading-[0.95] tracking-[-0.03em]">
             Nice one. <span className="font-serif italic font-medium text-je-blue-dark">Sit tight.</span>
           </h1>
           <p className="mt-4 text-[14px] text-je-charcoal/75 max-w-[420px] leading-relaxed">
-            Order <strong className="text-ink">{order.orderNumber}</strong> — estimated delivery around{" "}
+            Order No. <strong className="text-ink">{order.orderNumber}</strong> — estimated delivery around{" "}
             <strong className="text-ink">
               {eta.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
             </strong>
@@ -45,8 +54,17 @@ export default async function OrderPage(props: PageProps<"/order/[id]">) {
             <div className="rounded-[var(--r-lg)] border border-line bg-white p-5 sm:p-6">
               <h2 className="font-sans font-bold text-[16px] tracking-[-0.01em] mb-5 flex items-center justify-between">
                 Tracking
-                <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-je-grey-mid">
+                <span
+                  className="group relative inline-flex items-center gap-1.5 text-[11px] font-medium text-je-grey-mid cursor-help"
+                  tabIndex={0}
+                >
                   <Clock className="size-3.5" /> ~{Math.max(1, Math.round((eta.getTime() - Date.now()) / 60_000))} min
+                  <span
+                    role="tooltip"
+                    className="pointer-events-none absolute right-0 top-full mt-2 w-[220px] rounded-[var(--r-md)] bg-ink text-paper text-[11px] font-normal leading-relaxed px-3 py-2 opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 group-focus:opacity-100 group-focus:translate-y-0 transition-all duration-150 shadow-lg z-10 normal-case tracking-normal"
+                  >
+                    Estimated time until the driver arrives with your order.
+                  </span>
                 </span>
               </h2>
               <OrderTracker status={order.status} />
@@ -87,8 +105,8 @@ export default async function OrderPage(props: PageProps<"/order/[id]">) {
             </h2>
             <ul className="mt-4 flex flex-col gap-3 pb-4 border-b border-line">
               {order.lines.map((l) => (
-                <li key={l.lineId} className="flex gap-3 text-[13px]">
-                  <span className="text-je-grey-mid tabular-nums w-5 shrink-0">{l.quantity}×</span>
+                <li key={l.lineId} className="flex gap-2 text-[13px]">
+                  <span className="text-je-grey-mid tabular-nums shrink-0">{l.quantity}×</span>
                   <span className="flex-1 min-w-0">
                     <span className="block">{l.itemName}</span>
                     {l.modifierSelections.length > 0 && (

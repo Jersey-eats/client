@@ -7,6 +7,7 @@ import { Apple, CreditCard, Smartphone, Check, MapPin, Mail, Phone, FileText } f
 import { useBasket } from "@/lib/store/basket";
 import { MOCK_PARISHES } from "@/lib/data/mock/parishes";
 import { parishName } from "@/lib/data/services/parishes";
+import { Select } from "@/components/ui/Select";
 import { getCurrentUser } from "@/lib/data/services/auth";
 import { placeOrder } from "@/lib/data/services/orders";
 import { formatPrice } from "@/lib/utils";
@@ -202,18 +203,16 @@ export function CheckoutForm() {
                 onChange={(v) => setManual({ ...manual, line1: v })}
                 placeholder="Flat 3, La Grande Route de St Martin"
               />
-              <div>
-                <label className="text-[10px] uppercase tracking-[0.14em] font-semibold text-je-grey-mid">Parish</label>
-                <select
+              <label className="block">
+                <span className="text-[10px] uppercase tracking-[0.14em] font-semibold text-je-grey-mid">Parish</span>
+                <Select
                   value={manual.parish}
-                  onChange={(e) => setManual({ ...manual, parish: e.target.value as ParishCode })}
-                  className="mt-1 w-full rounded-[var(--r-md)] border border-line bg-white px-3.5 py-3 text-[14px] focus:border-ink outline-none"
-                >
-                  {MOCK_PARISHES.map((p) => (
-                    <option key={p.code} value={p.code}>{p.name}</option>
-                  ))}
-                </select>
-              </div>
+                  onChange={(v) => setManual({ ...manual, parish: v as ParishCode })}
+                  options={MOCK_PARISHES.map((p) => ({ value: p.code, label: p.name }))}
+                  wrapperClassName="mt-1"
+                  aria-label="Parish"
+                />
+              </label>
               <Field
                 label="Postcode (optional)"
                 value={manual.postcode ?? ""}

@@ -13,12 +13,34 @@ import type { UserProfile, SavedAddress } from "../types";
 
 let currentUser: UserProfile | null = null;
 
-export async function getCurrentUser(): Promise<UserProfile | null> {
+/**
+ * Hydrate the in-memory session from the Zustand-persisted auth store
+ * (`localStorage.je:auth`) when the module first loads in the browser.
+ * Without this, a page refresh resets the in-memory user to null even
+ * though the UI (Nav, guards) still sees the signed-in user via the
+ * store — leading to skeletons that never resolve.
+ * When a real Supabase client is wired in, delete this helper.
+ */
+function hydrate(): UserProfile | null {
+  if (typeof window === "undefined") return currentUser;
+  if (currentUser) return currentUser;
+  try {
+    const raw = window.localStorage.getItem("je:auth");
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { state?: { user?: UserProfile | null } };
+    if (parsed?.state?.user) currentUser = parsed.state.user;
+  } catch {
+    // localStorage unavailable or malformed — ignore
+  }
   return currentUser;
 }
 
+export async function getCurrentUser(): Promise<UserProfile | null> {
+  return hydrate();
+}
+
 export async function isSignedIn(): Promise<boolean> {
-  return currentUser != null;
+  return hydrate() != null;
 }
 
 /** @backend supabase.auth.signInWithPassword */
@@ -54,33 +76,37 @@ export async function sendPhoneCode(_phone: string): Promise<{ sent: true }> {
 
 /** @backend Twilio/Supabase OTP verify. */
 export async function verifyPhoneCode(_code: string): Promise<{ verified: true }> {
-  if (currentUser) currentUser = { ...currentUser, phoneVerified: true };
+  const user = hydrate();
+  if (user) currentUser = { ...user, phoneVerified: true };
   return { verified: true };
 }
 
 /** @backend supabase.from('profiles').update(...) */
 export async function updateProfile(patch: Partial<UserProfile>): Promise<UserProfile> {
-  if (!currentUser) throw new Error("Not signed in");
-  currentUser = { ...currentUser, ...patch };
+  const user = hydrate();
+  if (!user) throw new Error("Not signed in");
+  currentUser = { ...user, ...patch };
   return currentUser;
 }
 
 /** @backend supabase.from('addresses').insert/update */
 export async function upsertAddress(addr: SavedAddress): Promise<UserProfile> {
-  if (!currentUser) throw new Error("Not signed in");
-  const existing = currentUser.addresses.findIndex((a) => a.id === addr.id);
-  const addresses = [...currentUser.addresses];
+  const user = hydrate();
+  if (!user) throw new Error("Not signed in");
+  const existing = user.addresses.findIndex((a) => a.id === addr.id);
+  const addresses = [...user.addresses];
   if (addr.isDefault) addresses.forEach((a) => (a.isDefault = false));
   if (existing >= 0) addresses[existing] = addr;
   else addresses.push(addr);
-  currentUser = { ...currentUser, addresses };
+  currentUser = { ...user, addresses };
   return currentUser;
 }
 
 /** @backend supabase.from('addresses').delete().eq('id', id) */
 export async function removeAddress(id: string): Promise<UserProfile> {
-  if (!currentUser) throw new Error("Not signed in");
-  currentUser = { ...currentUser, addresses: currentUser.addresses.filter((a) => a.id !== id) };
+  const user = hydrate();
+  if (!user) throw new Error("Not signed in");
+  currentUser = { ...user, addresses: user.addresses.filter((a) => a.id !== id) };
   return currentUser;
 }
 

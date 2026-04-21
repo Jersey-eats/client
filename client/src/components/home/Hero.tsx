@@ -2,6 +2,7 @@ import { AtmosphereBlobs } from "./AtmosphereBlobs";
 import { ParishBar } from "./ParishBar";
 import { TrustStats } from "./TrustStats";
 import { CuisineChips } from "./CuisineChips";
+import { FoodMarquee } from "./FoodMarquee";
 import { Container } from "@/components/layout/Container";
 
 /**
@@ -17,7 +18,7 @@ export function Hero() {
     <section className="relative overflow-hidden bg-gradient-to-b from-mist to-paper">
       <AtmosphereBlobs />
 
-      <Container className="relative z-10 pt-16 pb-14 sm:pt-24 sm:pb-20 text-center">
+      <Container className="relative z-20 pt-16 sm:pt-24 text-center">
         <div
           className="inline-flex items-center gap-2.5 text-[11px] font-semibold tracking-[0.24em] uppercase text-je-blue-navy mb-7 je-rise"
           style={{ animationDelay: "60ms" }}
@@ -50,8 +51,14 @@ export function Hero() {
         <div className="je-rise" style={{ animationDelay: "360ms" }}>
           <CuisineChips />
         </div>
+      </Container>
 
-        <div className="je-rise" style={{ animationDelay: "440ms" }}>
+      <div className="relative z-10 mt-10 sm:mt-12 je-rise" style={{ animationDelay: "420ms" }}>
+        <FoodMarquee />
+      </div>
+
+      <Container className="relative z-10 pb-14 sm:pb-20 text-center">
+        <div className="je-rise mt-10 sm:mt-12" style={{ animationDelay: "500ms" }}>
           <TrustStats />
         </div>
       </Container>
