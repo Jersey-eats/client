@@ -2,36 +2,40 @@
 
 import { useEffect, useState } from "react";
 
-type ThemeId = "blue" | "green" | "forest" | "lime";
+type ThemeId = "sky" | "blue" | "forest" | "olive" | "lime" | "amber";
 
 const THEMES: { id: ThemeId; label: string; swatch: string }[] = [
-  { id: "blue", label: "Blue", swatch: "#1B6E8A" },
-  { id: "green", label: "Emerald", swatch: "#00BB55" },
-  { id: "forest", label: "Forest", swatch: "#2D6A4F" },
-  { id: "lime", label: "Lime", swatch: "#65A30D" },
+  { id: "sky", label: "Sky", swatch: "#5DBBD7" },
+  { id: "blue", label: "Blue", swatch: "#397BFF" },
+  { id: "forest", label: "Forest", swatch: "#2C6A4F" },
+  { id: "olive", label: "Olive", swatch: "#A4C87C" },
+  { id: "lime", label: "Lime", swatch: "#6BBC32" },
+  { id: "amber", label: "Amber", swatch: "#FEBA00" },
 ];
 
 /**
  * Demo-only palette switcher. Writes `data-theme` on <html> which is
- * consumed by CSS variable overrides in globals.css (`[data-theme="..."]`).
- * Preference persists via `localStorage:je:theme`; the inline bootstrap
- * script in layout.tsx applies it before React hydrates (no FOUC).
+ * consumed by CSS variable overrides in globals.css. The `sky` variant
+ * is the default (no attribute) — it matches the Jersey Eats brand
+ * signature blue. Preference persists via `localStorage:je:theme`;
+ * the inline bootstrap script in layout.tsx applies it before React
+ * hydrates (no FOUC).
  */
 export function ThemeSwitcher() {
-  const [active, setActive] = useState<ThemeId>("blue");
+  const [active, setActive] = useState<ThemeId>("sky");
 
   useEffect(() => {
     const saved = localStorage.getItem("je:theme");
-    const valid = THEMES.some((t) => t.id === saved) ? (saved as ThemeId) : "blue";
+    const valid = THEMES.some((t) => t.id === saved) ? (saved as ThemeId) : "sky";
     setActive(valid);
-    if (valid === "blue") document.documentElement.removeAttribute("data-theme");
+    if (valid === "sky") document.documentElement.removeAttribute("data-theme");
     else document.documentElement.setAttribute("data-theme", valid);
   }, []);
 
   const pick = (t: ThemeId) => {
     setActive(t);
     localStorage.setItem("je:theme", t);
-    if (t === "blue") {
+    if (t === "sky") {
       document.documentElement.removeAttribute("data-theme");
     } else {
       document.documentElement.setAttribute("data-theme", t);

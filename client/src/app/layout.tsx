@@ -12,7 +12,7 @@ import { TypographySwitcher } from "@/components/dev/TypographySwitcher";
 
 const bootstrap = `try{
   var t=localStorage.getItem('je:theme');
-  if(t==='green'||t==='forest'||t==='lime')document.documentElement.setAttribute('data-theme',t);
+  if(t==='blue'||t==='forest'||t==='olive'||t==='lime'||t==='amber')document.documentElement.setAttribute('data-theme',t);
   var f=localStorage.getItem('je:typography');
   if(f==='montserrat'||f==='jakarta'||f==='dm-sans')document.documentElement.setAttribute('data-typography',f);
 }catch(e){}`;

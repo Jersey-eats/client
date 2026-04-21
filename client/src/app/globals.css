@@ -67,42 +67,67 @@
    Theme variants (demo-only switcher) — override the accent
    trio + background tints. All other tokens stay constant so
    status colours, ink, and neutrals remain stable.
+   Default (`:root` above) = Sky / Jersey Eats brand #5DBBD7.
    ============================================================ */
 
-/* ─── Green — Emerald (vibrant, food-tech) ─── */
-[data-theme="green"] {
-  --je-blue: #7AE2A8;       /* fresh mint — backgrounds / soft pills */
-  --je-blue-dark: #00BB55;  /* emerald — italic em accent */
-  --je-blue-navy: #007035;  /* deep emerald — text / icons (≈7.38:1) */
-  --mist: #E8F6EE;
-  --paper: #F5FBF7;
-  --line: #D2E6D9;
-  --accent: #007035;
-  --logo-fill: #00BB55;
+/* ─── Blue — Royal (vibrant modern) — #397BFF ─── */
+[data-theme="blue"] {
+  --je-blue: #8FB4FF;       /* soft sky — backgrounds / pills */
+  --je-blue-dark: #397BFF;  /* royal blue — italic em accent */
+  --je-blue-navy: #1E4FA6;  /* deep royal — text / icons (≈6.8:1) */
+  --mist: #EEF3FD;
+  --paper: #F7FAFE;
+  --line: #D6E1F5;
+  --accent: #1E4FA6;
+  --logo-fill: #397BFF;
 }
 
-/* ─── Green — Forest (earthy, premium, slow-food) ─── */
+/* ─── Forest — deep earthy — #2C6A4F ─── */
 [data-theme="forest"] {
-  --je-blue: #95D5B2;       /* soft spring — backgrounds / pills */
-  --je-blue-dark: #2D6A4F;  /* forest green — italic em accent */
+  --je-blue: #95D5B2;       /* spring mint — backgrounds / pills */
+  --je-blue-dark: #2C6A4F;  /* forest — italic em accent */
   --je-blue-navy: #1B4332;  /* deep pine — text / icons (≈10.5:1) */
   --mist: #E8F2ED;
   --paper: #F5FAF7;
   --line: #D0DFD5;
   --accent: #1B4332;
-  --logo-fill: #2D6A4F;
+  --logo-fill: #2C6A4F;
 }
 
-/* ─── Green — Lime (bright, fresh, yellow-leaning) ─── */
+/* ─── Olive — muted, sophisticated — #A4C87C ─── */
+[data-theme="olive"] {
+  --je-blue: #D5E6B9;       /* pale olive — backgrounds / pills */
+  --je-blue-dark: #A4C87C;  /* olive — italic em accent */
+  --je-blue-navy: #4E7227;  /* dark olive — text / icons (≈6.1:1) */
+  --mist: #F1F6E9;
+  --paper: #F9FBF3;
+  --line: #DDE6CC;
+  --accent: #4E7227;
+  --logo-fill: #A4C87C;
+}
+
+/* ─── Lime — vibrant, fresh — #6BBC32 ─── */
 [data-theme="lime"] {
-  --je-blue: #BEF264;       /* light lime — backgrounds / pills */
-  --je-blue-dark: #65A30D;  /* lime — italic em accent */
-  --je-blue-navy: #365314;  /* dark olive — text / icons (≈8.9:1) */
-  --mist: #F5F9E8;
-  --paper: #FAFBF3;
-  --line: #DFE4C8;
-  --accent: #365314;
-  --logo-fill: #65A30D;
+  --je-blue: #B4E085;       /* pale lime — backgrounds / pills */
+  --je-blue-dark: #6BBC32;  /* lime — italic em accent */
+  --je-blue-navy: #2F5F16;  /* dark olive-green — text / icons (≈9.0:1) */
+  --mist: #EEF7E2;
+  --paper: #F6FBED;
+  --line: #CFE5B5;
+  --accent: #2F5F16;
+  --logo-fill: #6BBC32;
+}
+
+/* ─── Amber — warm gold — #FEBA00 ─── */
+[data-theme="amber"] {
+  --je-blue: #FFE095;       /* pale gold — backgrounds / pills */
+  --je-blue-dark: #FEBA00;  /* amber — italic em accent */
+  --je-blue-navy: #8A6500;  /* deep gold — text / icons (≈6.9:1) */
+  --mist: #FFF7E0;
+  --paper: #FFFCF2;
+  --line: #F0E0B5;
+  --accent: #8A6500;
+  --logo-fill: #FEBA00;
 }
 
 /* ============================================================
