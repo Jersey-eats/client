@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from "react";
 
-type FontId = "inter" | "montserrat" | "jakarta" | "dm-sans";
+type FontId = "montserrat" | "inter" | "jakarta" | "dm-sans";
+
+const DEFAULT_FONT: FontId = "montserrat";
 
 const FONTS: { id: FontId; label: string; cssFamily: string }[] = [
-  { id: "inter", label: "Inter", cssFamily: "var(--font-inter)" },
   { id: "montserrat", label: "Montserrat", cssFamily: "var(--font-montserrat)" },
+  { id: "inter", label: "Inter", cssFamily: "var(--font-inter)" },
   { id: "jakarta", label: "Plus Jakarta Sans", cssFamily: "var(--font-jakarta)" },
   { id: "dm-sans", label: "DM Sans", cssFamily: "var(--font-dm-sans)" },
 ];
@@ -18,20 +20,20 @@ const FONTS: { id: FontId; label: string; cssFamily: string }[] = [
  * font family changes.
  */
 export function TypographySwitcher() {
-  const [active, setActive] = useState<FontId>("inter");
+  const [active, setActive] = useState<FontId>(DEFAULT_FONT);
 
   useEffect(() => {
     const saved = localStorage.getItem("je:typography");
-    const valid = FONTS.some((f) => f.id === saved) ? (saved as FontId) : "inter";
+    const valid = FONTS.some((f) => f.id === saved) ? (saved as FontId) : DEFAULT_FONT;
     setActive(valid);
-    if (valid === "inter") document.documentElement.removeAttribute("data-typography");
+    if (valid === DEFAULT_FONT) document.documentElement.removeAttribute("data-typography");
     else document.documentElement.setAttribute("data-typography", valid);
   }, []);
 
   const pick = (f: FontId) => {
     setActive(f);
     localStorage.setItem("je:typography", f);
-    if (f === "inter") {
+    if (f === DEFAULT_FONT) {
       document.documentElement.removeAttribute("data-typography");
     } else {
       document.documentElement.setAttribute("data-typography", f);

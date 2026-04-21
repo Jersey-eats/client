@@ -12,9 +12,9 @@ import { TypographySwitcher } from "@/components/dev/TypographySwitcher";
 
 const bootstrap = `try{
   var t=localStorage.getItem('je:theme');
-  if(t==='blue'||t==='forest'||t==='olive'||t==='lime'||t==='amber')document.documentElement.setAttribute('data-theme',t);
+  if(t==='sky'||t==='forest'||t==='olive'||t==='lime'||t==='amber')document.documentElement.setAttribute('data-theme',t);
   var f=localStorage.getItem('je:typography');
-  if(f==='montserrat'||f==='jakarta'||f==='dm-sans')document.documentElement.setAttribute('data-typography',f);
+  if(f==='inter'||f==='jakarta'||f==='dm-sans')document.documentElement.setAttribute('data-typography',f);
 }catch(e){}`;
 
 const inter = Inter({

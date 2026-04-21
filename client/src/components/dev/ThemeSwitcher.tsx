@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from "react";
 
-type ThemeId = "sky" | "blue" | "forest" | "olive" | "lime" | "amber";
+type ThemeId = "blue" | "sky" | "forest" | "olive" | "lime" | "amber";
+
+const DEFAULT_THEME: ThemeId = "blue";
 
 const THEMES: { id: ThemeId; label: string; swatch: string }[] = [
-  { id: "sky", label: "Sky", swatch: "#5DBBD7" },
   { id: "blue", label: "Blue", swatch: "#397BFF" },
+  { id: "sky", label: "Sky", swatch: "#5DBBD7" },
   { id: "forest", label: "Forest", swatch: "#2C6A4F" },
   { id: "olive", label: "Olive", swatch: "#A4C87C" },
   { id: "lime", label: "Lime", swatch: "#6BBC32" },
@@ -22,20 +24,20 @@ const THEMES: { id: ThemeId; label: string; swatch: string }[] = [
  * hydrates (no FOUC).
  */
 export function ThemeSwitcher() {
-  const [active, setActive] = useState<ThemeId>("sky");
+  const [active, setActive] = useState<ThemeId>(DEFAULT_THEME);
 
   useEffect(() => {
     const saved = localStorage.getItem("je:theme");
-    const valid = THEMES.some((t) => t.id === saved) ? (saved as ThemeId) : "sky";
+    const valid = THEMES.some((t) => t.id === saved) ? (saved as ThemeId) : DEFAULT_THEME;
     setActive(valid);
-    if (valid === "sky") document.documentElement.removeAttribute("data-theme");
+    if (valid === DEFAULT_THEME) document.documentElement.removeAttribute("data-theme");
     else document.documentElement.setAttribute("data-theme", valid);
   }, []);
 
   const pick = (t: ThemeId) => {
     setActive(t);
     localStorage.setItem("je:theme", t);
-    if (t === "sky") {
+    if (t === DEFAULT_THEME) {
       document.documentElement.removeAttribute("data-theme");
     } else {
       document.documentElement.setAttribute("data-theme", t);

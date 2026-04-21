@@ -6,10 +6,10 @@
    ============================================================ */
 
 :root {
-  /* Primary blues */
-  --je-blue: #5BC0DE;
-  --je-blue-dark: #2A9DC2;
-  --je-blue-navy: #1B6E8A;
+  /* Primary blues — default theme is Royal Blue (#397BFF) per client choice */
+  --je-blue: #8FB4FF;
+  --je-blue-dark: #397BFF;
+  --je-blue-navy: #1E4FA6;
 
   /* Secondary greens */
   --je-green: #4CAF50;
@@ -36,13 +36,13 @@
   --je-white: #FFFFFF;
   --je-off-white: #F7F9FA;
 
-  /* K × O × L working tokens — cool-tinted after pivot to blue-led palette */
+  /* K × O × L working tokens — tuned for the Royal Blue #397BFF default */
   --ink: #141A1E;              /* faintly cool near-black */
-  --paper: #F6FAFC;            /* cool pale blue-white (was warm #FBF8F3) */
-  --line: #DCE5EB;             /* cool light border (was warm #E8E2D9) */
-  --mist: #EDF5F9;             /* cool cream-replacement — subtle blue mist background */
-  --accent: #1B6E8A;           /* primary brand accent, per user direction */
-  --logo-fill: #5DBBD7;        /* fills the big circle + letter accents in the Jersey Eats mark */
+  --paper: #F7FAFE;            /* pale royal-blue-tinted white */
+  --line: #D6E1F5;             /* cool blue-tinted border */
+  --mist: #EEF3FD;             /* subtle royal-blue mist background */
+  --accent: #1E4FA6;           /* deep royal — small text + icons */
+  --logo-fill: #397BFF;        /* fills the big circle + letter accents in the Jersey Eats mark */
   --modal-bg: hsl(0 0% 97%);   /* neutral grey — used on every modal/drawer, never theme-tinted */
 
   /* Surfaces */
@@ -67,19 +67,19 @@
    Theme variants (demo-only switcher) — override the accent
    trio + background tints. All other tokens stay constant so
    status colours, ink, and neutrals remain stable.
-   Default (`:root` above) = Sky / Jersey Eats brand #5DBBD7.
+   Default (`:root` above) = Royal Blue #397BFF (client pick).
    ============================================================ */
 
-/* ─── Blue — Royal (vibrant modern) — #397BFF ─── */
-[data-theme="blue"] {
-  --je-blue: #8FB4FF;       /* soft sky — backgrounds / pills */
-  --je-blue-dark: #397BFF;  /* royal blue — italic em accent */
-  --je-blue-navy: #1E4FA6;  /* deep royal — text / icons (≈6.8:1) */
-  --mist: #EEF3FD;
-  --paper: #F7FAFE;
-  --line: #D6E1F5;
-  --accent: #1E4FA6;
-  --logo-fill: #397BFF;
+/* ─── Sky — Jersey Eats brand light blue — #5DBBD7 ─── */
+[data-theme="sky"] {
+  --je-blue: #5BC0DE;       /* light sky — backgrounds / pills */
+  --je-blue-dark: #5DBBD7;  /* Jersey Eats signature blue — italic em accent */
+  --je-blue-navy: #1B6E8A;  /* deep teal-blue — text / icons (≈6.0:1) */
+  --mist: #EDF5F9;
+  --paper: #F6FAFC;
+  --line: #DCE5EB;
+  --accent: #1B6E8A;
+  --logo-fill: #5DBBD7;
 }
 
 /* ─── Forest — deep earthy — #2C6A4F ─── */
@@ -134,11 +134,12 @@
    Typography variants (demo-only switcher) — override the sans
    font family on root + .font-sans utility. Fraunces (.font-serif)
    is unaffected because it has its own explicit font-family rule.
+   Default = Montserrat (client pick). Other options override.
    ============================================================ */
 
-[data-typography="montserrat"],
-[data-typography="montserrat"] .font-sans {
-  font-family: var(--font-montserrat), "Helvetica Neue", Arial, sans-serif;
+[data-typography="inter"],
+[data-typography="inter"] .font-sans {
+  font-family: var(--font-inter), "Helvetica Neue", Arial, sans-serif;
 }
 
 [data-typography="jakarta"],
@@ -179,8 +180,8 @@
   --color-mist: var(--mist);
   --color-accent: var(--accent);
 
-  /* Fonts (provided by next/font in layout.tsx) */
-  --font-sans: var(--font-inter), "Helvetica Neue", Arial, sans-serif;
+  /* Fonts (provided by next/font in layout.tsx) — default sans is Montserrat (client pick) */
+  --font-sans: var(--font-montserrat), "Helvetica Neue", Arial, sans-serif;
   --font-serif: var(--font-fraunces), Georgia, "Times New Roman", serif;
 
   /* Radius scale */
