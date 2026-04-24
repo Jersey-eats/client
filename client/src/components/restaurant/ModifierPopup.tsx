@@ -131,7 +131,7 @@ export function ModifierPopup({ item, restaurant, open, onClose }: Props) {
           <motion.div
             role="dialog"
             aria-labelledby="modifier-title"
-            className="relative w-full sm:max-w-[520px] bg-[var(--modal-bg)] rounded-t-[28px] sm:rounded-[var(--r-lg)] max-h-[92vh] flex flex-col shadow-[0_-24px_60px_rgba(26,22,20,0.25)]"
+            className="relative w-full sm:max-w-[520px] bg-[var(--modal-bg)] rounded-[28px] sm:rounded-[var(--r-lg)] max-h-[92vh] flex flex-col overflow-hidden shadow-[0_-24px_60px_rgba(26,22,20,0.25)]"
             initial={{ y: "100%", opacity: 0.9 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: "100%" }}
@@ -184,50 +184,68 @@ export function ModifierPopup({ item, restaurant, open, onClose }: Props) {
                   No extras — just the classic.
                 </p>
               )}
-              {item.modifierGroups.map((g) => (
-                <fieldset key={g.id}>
-                  <legend className="flex items-center justify-between w-full mb-3">
-                    <span className="font-sans font-semibold text-[14px] tracking-[-0.01em]">
-                      {g.name}
-                    </span>
-                    <span className="text-[10px] uppercase tracking-[0.12em] text-je-grey-mid font-semibold">
-                      {g.required ? "Required" : "Optional"} · up to {g.maxSelections}
-                    </span>
-                  </legend>
-                  <ul className="flex flex-col gap-2">
-                    {g.options.map((o) => {
-                      const selected = (selections[g.id] ?? []).includes(o.id);
-                      return (
-                        <li key={o.id}>
-                          <button
-                            type="button"
-                            onClick={() => toggle(g, o)}
-                            className={`w-full flex items-center justify-between gap-4 p-3.5 rounded-[var(--r-md)] border text-left transition-colors ${
-                              selected
-                                ? "bg-ink text-paper border-ink"
-                                : "bg-white text-ink border-line hover:border-ink"
-                            }`}
-                          >
-                            <span className="flex items-center gap-3">
+              {item.modifierGroups.map((g) => {
+                const isMulti = g.maxSelections > 1;
+                return (
+                  <fieldset key={g.id}>
+                    <legend className="flex items-center justify-between w-full mb-3">
+                      <span className="font-sans font-semibold text-[14px] tracking-[-0.01em]">
+                        {g.name}
+                      </span>
+                      <span className="text-[10px] uppercase tracking-[0.12em] text-je-grey-mid font-semibold">
+                        {g.required ? "Required" : "Optional"} · up to {g.maxSelections}
+                      </span>
+                    </legend>
+                    <ul className="flex flex-col gap-2">
+                      {g.options.map((o) => {
+                        const selected = (selections[g.id] ?? []).includes(o.id);
+                        return (
+                          <li key={o.id}>
+                            <button
+                              type="button"
+                              role={isMulti ? "checkbox" : "radio"}
+                              aria-checked={selected}
+                              onClick={() => toggle(g, o)}
+                              className={`w-full flex items-center justify-between gap-4 p-3.5 rounded-[var(--r-md)] border text-left transition-colors ${
+                                selected
+                                  ? "bg-je-blue/25 text-ink border-je-blue-dark"
+                                  : "bg-white text-ink border-line hover:border-ink"
+                              }`}
+                            >
+                              <span className="flex items-center gap-3">
+                                <span
+                                  className={`size-5 shrink-0 border-[1.5px] inline-flex items-center justify-center ${
+                                    isMulti ? "rounded-[5px]" : "rounded-full"
+                                  } ${
+                                    selected
+                                      ? "bg-je-blue-navy border-je-blue-navy"
+                                      : "bg-white border-line"
+                                  }`}
+                                >
+                                  {selected &&
+                                    (isMulti ? (
+                                      <Check className="size-3 text-white" strokeWidth={3} />
+                                    ) : (
+                                      <span className="size-2 rounded-full bg-white" />
+                                    ))}
+                                </span>
+                                <span className="text-[14px] font-medium">{o.name}</span>
+                              </span>
                               <span
-                                className={`size-5 rounded-full border-[1.5px] inline-flex items-center justify-center ${
-                                  selected ? "border-paper bg-je-blue text-ink" : "border-line"
+                                className={`text-[13px] tabular-nums ${
+                                  selected ? "text-ink/75" : "text-je-grey-mid"
                                 }`}
                               >
-                                {selected && <Check className="size-3" strokeWidth={3} />}
+                                {o.pricePence > 0 ? `+${formatPrice(o.pricePence)}` : "Included"}
                               </span>
-                              <span className="text-[14px] font-medium">{o.name}</span>
-                            </span>
-                            <span className={`text-[13px] tabular-nums ${selected ? "text-paper/80" : "text-je-grey-mid"}`}>
-                              {o.pricePence > 0 ? `+${formatPrice(o.pricePence)}` : "Included"}
-                            </span>
-                          </button>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </fieldset>
-              ))}
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </fieldset>
+                );
+              })}
             </div>
 
             <footer className="border-t border-line p-5 sm:p-6 bg-white flex items-center gap-3">

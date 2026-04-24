@@ -1,8 +1,33 @@
+"use client";
+
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 import { Logo } from "@/components/brand/Logo";
 import { Container } from "./Container";
-import Link from "next/link";
 
+/**
+ * Global footer. On /checkout the full link grid is swapped for a
+ * minimal bottom band — same treatment as the nav up top, so the user
+ * stays focused on finishing their order and doesn't get distracted by
+ * escape routes.
+ */
 export function Footer() {
+  const pathname = usePathname();
+  const isCheckout = pathname?.startsWith("/checkout");
+
+  if (isCheckout) {
+    return (
+      <footer className="mt-12 bg-ink text-paper/70">
+        <Container className="py-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] tracking-[0.1em] uppercase">
+          <span>© 2026 Jersey Eats · Channel Islands</span>
+          <span className="font-serif italic normal-case tracking-normal text-paper/55">
+            Secure checkout — your card details never touch our servers
+          </span>
+        </Container>
+      </footer>
+    );
+  }
+
   return (
     <footer className="mt-12 bg-ink text-paper/90">
       <Container className="py-14 grid gap-10 md:grid-cols-[1.2fr_1fr_1fr_1fr]">

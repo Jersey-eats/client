@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { MapPin, Menu, User, X } from "lucide-react";
+import { ArrowLeft, MapPin, Menu, User, X } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { Container } from "./Container";
 import { cn } from "@/lib/utils";
@@ -14,12 +15,16 @@ import { useAuth } from "@/lib/store/auth";
 /**
  * L-style two-zone minimal nav on cream backdrop with blur.
  * Shows the selected parish as an editable badge once the user has chosen one.
+ * On /checkout the full nav is replaced with a stripped-down logo + back
+ * header so the user stays focused on the payment flow.
  */
 export function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const parish = useParish((s) => s.parish);
   const user = useAuth((s) => s.user);
+  const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -27,6 +32,24 @@ export function Nav() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  if (pathname?.startsWith("/checkout")) {
+    return (
+      <header className="sticky top-0 z-40 bg-mist/90 backdrop-blur-[14px] border-b border-[color:rgba(27,110,138,0.08)]">
+        <Container className="flex items-center justify-between py-3.5 sm:py-4">
+          <Logo size={48} />
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="inline-flex items-center gap-1.5 rounded-full border border-line bg-white/60 px-3.5 py-1.5 text-[12px] font-medium text-ink hover:border-ink transition-colors"
+          >
+            <ArrowLeft className="size-3.5" />
+            Back
+          </button>
+        </Container>
+      </header>
+    );
+  }
 
   return (
     <header

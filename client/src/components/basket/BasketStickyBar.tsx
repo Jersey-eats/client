@@ -1,15 +1,18 @@
 "use client";
 
 import { ShoppingBag } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { useBasket } from "@/lib/store/basket";
 import { formatPrice } from "@/lib/utils";
 import { useEffect, useState } from "react";
 
 /**
  * Persistent bottom bar shown on mobile when the basket has any items,
- * per UX playbook §2.4. Tapping opens the drawer.
+ * per UX playbook §2.4. Tapping opens the drawer. Hidden on /checkout
+ * where the user is already reviewing and finalising the basket.
  */
 export function BasketStickyBar() {
+  const pathname = usePathname();
   const count = useBasket((s) => s.itemCount());
   const subtotal = useBasket((s) => s.subtotalPence());
   const open = useBasket((s) => s.open);
@@ -18,6 +21,7 @@ export function BasketStickyBar() {
   useEffect(() => setMounted(true), []);
 
   if (!mounted || count === 0) return null;
+  if (pathname?.startsWith("/checkout")) return null;
 
   return (
     <button

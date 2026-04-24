@@ -3,15 +3,16 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Apple, CreditCard, Smartphone, Check, MapPin, Mail, Phone, FileText } from "lucide-react";
+import { CreditCard, Check, MapPin, Mail, Phone, ShieldCheck } from "lucide-react";
 import { useBasket } from "@/lib/store/basket";
+import { useParish } from "@/lib/store/parish";
 import { MOCK_PARISHES } from "@/lib/data/mock/parishes";
 import { parishName } from "@/lib/data/services/parishes";
 import { Select } from "@/components/ui/Select";
 import { getCurrentUser } from "@/lib/data/services/auth";
 import { placeOrder } from "@/lib/data/services/orders";
 import { formatPrice } from "@/lib/utils";
-import type { ParishCode, SavedAddress, UserProfile } from "@/lib/data/types";
+import type { BasketLine, ParishCode, SavedAddress, UserProfile } from "@/lib/data/types";
 
 type Payment = "apple_pay" | "google_pay" | "card";
 
@@ -21,10 +22,15 @@ export function CheckoutForm() {
   const subtotal = useBasket((s) => s.subtotalPence());
   const clear = useBasket((s) => s.clear);
 
+  const groups = useMemo(() => groupByRestaurant(lines), [lines]);
+
   const [user, setUser] = useState<UserProfile | null>(null);
   useEffect(() => {
     getCurrentUser().then(setUser);
   }, []);
+
+  const storedParish = useParish((s) => s.parish);
+  const lockedParish: ParishCode = storedParish ?? "st_helier";
 
   const [mode, setMode] = useState<"saved" | "manual">("saved");
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
@@ -32,11 +38,15 @@ export function CheckoutForm() {
     id: "m",
     label: "Delivery",
     line1: "",
-    parish: "st_helier",
+    parish: lockedParish,
     postcode: "",
     note: "",
     isDefault: false,
   });
+
+  useEffect(() => {
+    setManual((prev) => ({ ...prev, parish: lockedParish }));
+  }, [lockedParish]);
   const [contact, setContact] = useState({ phone: "", email: "" });
   const [payment, setPayment] = useState<Payment>("apple_pay");
   const [placing, setPlacing] = useState(false);
@@ -119,10 +129,12 @@ export function CheckoutForm() {
         {!user && (
           <section className="rounded-[var(--r-lg)] border border-line bg-mist p-5 flex flex-wrap items-center justify-between gap-3">
             <div>
-              <div className="text-[10px] font-semibold tracking-[0.18em] uppercase text-je-blue-navy">Faster next time</div>
-              <div className="mt-1 text-[14px]">
+              <h3 className="font-sans font-bold text-[15px] tracking-[-0.01em]">
+                Faster next time
+              </h3>
+              <p className="mt-1 text-[13px] text-je-grey-mid">
                 Sign in to reuse saved addresses and payment.
-              </div>
+              </p>
             </div>
             <div className="flex gap-2">
               <Link href="/login" className="inline-flex rounded-full border border-ink px-4 py-2 text-[12px] font-medium">Sign in</Link>
@@ -202,22 +214,27 @@ export function CheckoutForm() {
                 value={manual.line1}
                 onChange={(v) => setManual({ ...manual, line1: v })}
                 placeholder="Flat 3, La Grande Route de St Martin"
+                required
               />
               <label className="block">
-                <span className="text-[10px] uppercase tracking-[0.14em] font-semibold text-je-grey-mid">Parish</span>
+                <span className="text-[10px] uppercase tracking-[0.14em] font-semibold text-je-grey-mid">
+                  Parish
+                </span>
                 <Select
-                  value={manual.parish}
-                  onChange={(v) => setManual({ ...manual, parish: v as ParishCode })}
+                  value={lockedParish}
+                  onChange={() => {}}
                   options={MOCK_PARISHES.map((p) => ({ value: p.code, label: p.name }))}
                   wrapperClassName="mt-1"
                   aria-label="Parish"
+                  disabled
                 />
               </label>
               <Field
-                label="Postcode (optional)"
+                label="Postcode"
                 value={manual.postcode ?? ""}
                 onChange={(v) => setManual({ ...manual, postcode: v })}
                 placeholder="JE2 3RR"
+                hint="Optional"
               />
               <Field
                 label="Note for the driver"
@@ -226,7 +243,8 @@ export function CheckoutForm() {
                 onChange={(v) => setManual({ ...manual, note: v })}
                 placeholder="Ring doorbell twice, blue door on the left."
                 hint="Optional"
-                icon={<FileText className="size-3.5 text-je-grey-mid" />}
+                multiline
+                rows={3}
               />
             </div>
           )}
@@ -240,6 +258,7 @@ export function CheckoutForm() {
               onChange={(v) => setContact((c) => ({ ...c, phone: v }))}
               placeholder="+44 7700 900123"
               icon={<Phone className="size-3.5 text-je-grey-mid" />}
+              required
             />
             <Field
               label="Email"
@@ -248,30 +267,32 @@ export function CheckoutForm() {
               placeholder="you@example.je"
               icon={<Mail className="size-3.5 text-je-grey-mid" />}
               inputType="email"
+              required
             />
           </div>
         </Section>
 
         <Section title="Payment" icon={<CreditCard className="size-4" />}>
+          <div className="inline-flex items-center gap-2 rounded-full bg-je-green/10 text-je-green-dark px-3 py-1.5 mb-4 text-[12px] font-semibold">
+            <ShieldCheck className="size-4" strokeWidth={2.25} />
+            Secure payments
+          </div>
           <div className="grid gap-2.5 sm:grid-cols-3">
             <PaymentTile
               active={payment === "apple_pay"}
               onClick={() => setPayment("apple_pay")}
-              icon={<Apple className="size-5" />}
               name="Apple Pay"
               hint="Face ID / Touch ID"
             />
             <PaymentTile
               active={payment === "google_pay"}
               onClick={() => setPayment("google_pay")}
-              icon={<Smartphone className="size-5" />}
               name="Google Pay"
               hint="Device biometrics"
             />
             <PaymentTile
               active={payment === "card"}
               onClick={() => setPayment("card")}
-              icon={<CreditCard className="size-5" />}
               name="Card"
               hint="Visa, Mastercard, Amex"
             />
@@ -286,25 +307,31 @@ export function CheckoutForm() {
       <aside className="lg:sticky lg:top-[80px]">
         <div className="rounded-[var(--r-lg)] border border-line bg-white p-5">
           <div className="text-[10px] font-semibold tracking-[0.18em] uppercase text-je-blue-navy">Order summary</div>
-          <h2 className="mt-1.5 font-sans font-bold text-[18px] tracking-[-0.01em]">
-            {lines[0]?.restaurantName}
-          </h2>
-          <ul className="mt-4 flex flex-col gap-3 pb-4 border-b border-line">
-            {lines.map((l) => (
-              <li key={l.lineId} className="flex gap-3 text-[13px]">
-                <span className="text-je-grey-mid tabular-nums w-5 shrink-0">{l.quantity}×</span>
-                <span className="flex-1 min-w-0">
-                  <span className="block">{l.itemName}</span>
-                  {l.modifierSelections.length > 0 && (
-                    <span className="block text-[11px] text-je-grey-mid">
-                      {l.modifierSelections.map((m) => m.optionName).join(" · ")}
-                    </span>
-                  )}
-                </span>
-                <span className="tabular-nums font-semibold shrink-0">{formatPrice(l.totalPence)}</span>
-              </li>
+          <div className="mt-4 flex flex-col gap-5 pb-4 border-b border-line">
+            {groups.map((g) => (
+              <div key={g.slug} className="flex flex-col gap-3">
+                <h2 className="font-sans font-bold text-[15px] tracking-[-0.01em]">
+                  {g.restaurantName}
+                </h2>
+                <ul className="flex flex-col gap-3">
+                  {g.lines.map((l) => (
+                    <li key={l.lineId} className="flex gap-2 text-[13px]">
+                      <span className="text-je-grey-mid tabular-nums shrink-0">{l.quantity}×</span>
+                      <span className="flex-1 min-w-0">
+                        <span className="block">{l.itemName}</span>
+                        {l.modifierSelections.length > 0 && (
+                          <span className="block text-[11px] text-je-grey-mid">
+                            {l.modifierSelections.map((m) => m.optionName).join(" · ")}
+                          </span>
+                        )}
+                      </span>
+                      <span className="tabular-nums font-semibold shrink-0">{formatPrice(l.totalPence)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
-          </ul>
+          </div>
           <dl className="mt-4 space-y-1.5 text-[13px]">
             <Row label="Subtotal" value={formatPrice(subtotal)} />
             <Row label="Delivery" value={formatPrice(deliveryFeePence)} />
@@ -352,6 +379,9 @@ function Field({
   hint,
   icon,
   inputType = "text",
+  multiline,
+  rows = 3,
+  required,
 }: {
   label: string;
   value: string;
@@ -361,23 +391,47 @@ function Field({
   hint?: string;
   icon?: React.ReactNode;
   inputType?: string;
+  multiline?: boolean;
+  rows?: number;
+  required?: boolean;
 }) {
   return (
     <label className={`block ${className ?? ""}`}>
-      <span className="flex items-center justify-between">
-        <span className="text-[10px] uppercase tracking-[0.14em] font-semibold text-je-grey-mid">{label}</span>
-        {hint && <span className="text-[10px] text-je-grey-mid">{hint}</span>}
+      <span className="text-[10px] uppercase tracking-[0.14em] font-semibold text-je-grey-mid inline-flex items-baseline gap-1.5">
+        <span>{label}</span>
+        {required && <span className="text-je-coral tracking-normal">*</span>}
+        {hint && (
+          <span className="normal-case tracking-normal font-medium text-je-grey-mid/80">
+            ({hint.toLowerCase()})
+          </span>
+        )}
       </span>
-      <span className="mt-1 flex items-center gap-2 rounded-[var(--r-md)] border border-line bg-white px-3.5 py-3 focus-within:border-ink">
-        {icon}
-        <input
-          type={inputType}
+      {multiline ? (
+        <textarea
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="flex-1 text-[14px] outline-none bg-transparent placeholder:text-je-grey-mid/70"
+          rows={rows}
+          className="mt-1 w-full rounded-[var(--r-md)] border border-line bg-white px-3.5 py-3 text-[14px] focus:border-ink outline-none placeholder:text-je-grey-mid/70 resize-none leading-relaxed"
         />
-      </span>
+      ) : (
+        <span className="relative mt-1 block">
+          {icon && (
+            <span className="pointer-events-none absolute inset-y-0 left-3.5 inline-flex items-center">
+              {icon}
+            </span>
+          )}
+          <input
+            type={inputType}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={placeholder}
+            className={`w-full rounded-[var(--r-md)] border border-line bg-white py-3 text-[14px] focus:border-ink outline-none placeholder:text-je-grey-mid/70 ${
+              icon ? "pl-10 pr-3.5" : "px-3.5"
+            }`}
+          />
+        </span>
+      )}
     </label>
   );
 }
@@ -385,13 +439,11 @@ function Field({
 function PaymentTile({
   active,
   onClick,
-  icon,
   name,
   hint,
 }: {
   active: boolean;
   onClick: () => void;
-  icon: React.ReactNode;
   name: string;
   hint: string;
 }) {
@@ -399,26 +451,50 @@ function PaymentTile({
     <button
       type="button"
       onClick={onClick}
-      className={`flex flex-col gap-2 p-4 rounded-[var(--r-md)] border text-left transition-colors ${
-        active ? "bg-ink text-paper border-ink" : "bg-white border-line hover:border-ink"
+      role="radio"
+      aria-checked={active}
+      className={`flex items-center gap-3 p-4 rounded-[var(--r-md)] border text-left transition-colors ${
+        active
+          ? "bg-je-blue/25 text-ink border-je-blue-dark"
+          : "bg-white text-ink border-line hover:border-ink"
       }`}
     >
-      <span className="flex items-center justify-between">
-        <span className={active ? "text-paper" : "text-ink"}>{icon}</span>
-        <span
-          className={`size-4 rounded-full border-[1.5px] inline-flex items-center justify-center ${
-            active ? "border-paper bg-je-blue text-ink" : "border-line"
-          }`}
-        >
-          {active && <Check className="size-2.5" strokeWidth={3} />}
-        </span>
+      <span
+        className={`size-5 shrink-0 rounded-full border-[1.5px] inline-flex items-center justify-center ${
+          active ? "bg-je-blue-navy border-je-blue-navy" : "bg-white border-line"
+        }`}
+      >
+        {active && <span className="size-2 rounded-full bg-white" />}
       </span>
-      <span>
+      <span className="min-w-0">
         <span className="block font-sans font-semibold text-[13px]">{name}</span>
-        <span className={`block text-[11px] ${active ? "text-paper/70" : "text-je-grey-mid"}`}>{hint}</span>
+        <span className={`block text-[11px] ${active ? "text-ink/70" : "text-je-grey-mid"}`}>{hint}</span>
       </span>
     </button>
   );
+}
+
+type RestaurantGroup = {
+  slug: string;
+  restaurantName: string;
+  lines: BasketLine[];
+};
+
+function groupByRestaurant(lines: BasketLine[]): RestaurantGroup[] {
+  const bySlug = new Map<string, RestaurantGroup>();
+  for (const l of lines) {
+    const g = bySlug.get(l.restaurantSlug);
+    if (g) {
+      g.lines.push(l);
+    } else {
+      bySlug.set(l.restaurantSlug, {
+        slug: l.restaurantSlug,
+        restaurantName: l.restaurantName,
+        lines: [l],
+      });
+    }
+  }
+  return [...bySlug.values()];
 }
 
 function Row({ label, value }: { label: string; value: string }) {

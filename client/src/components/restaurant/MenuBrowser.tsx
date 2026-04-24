@@ -42,7 +42,7 @@ export function MenuBrowser({ restaurant, menu }: Props) {
   return (
     <>
       {menu.length > 1 && (
-        <div className="sticky top-[64px] z-30 bg-paper/90 backdrop-blur-md border-b border-line">
+        <div className="sticky top-[76px] sm:top-[80px] z-30 bg-paper/90 backdrop-blur-md border-b border-line">
           <div className="mx-auto max-w-6xl px-5 sm:px-8">
             <div className="flex gap-2 overflow-x-auto no-scrollbar py-3">
               {menu.map((c) => (
@@ -91,23 +91,10 @@ export function MenuBrowser({ restaurant, menu }: Props) {
                     className="group w-full h-full text-left flex gap-4 items-start rounded-[var(--r-lg)] border border-line bg-white p-4 hover:border-ink hover:shadow-[0_10px_24px_rgba(26,22,20,0.06)] transition-all"
                   >
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <h3 className="font-sans font-bold text-[15px] tracking-[-0.01em] truncate">
                           {it.name}
                         </h3>
-                        {it.popular && (
-                          <span className="text-[9px] font-semibold tracking-[0.12em] uppercase bg-je-blue/15 text-je-blue-navy px-1.5 py-0.5 rounded-full">
-                            Popular
-                          </span>
-                        )}
-                      </div>
-                      <p className="mt-1 text-[12px] text-je-grey-mid leading-relaxed line-clamp-2">
-                        {it.description}
-                      </p>
-                      <div className="mt-3 flex items-center justify-between">
-                        <span className="text-[14px] font-semibold tabular-nums">
-                          {formatPrice(it.pricePence)}
-                        </span>
                         {it.dietary && it.dietary.length > 0 && (
                           <ul className="flex gap-1">
                             {it.dietary.map((d) => (
@@ -120,6 +107,19 @@ export function MenuBrowser({ restaurant, menu }: Props) {
                             ))}
                           </ul>
                         )}
+                        {it.popular && (
+                          <span className="text-[9px] font-semibold tracking-[0.12em] uppercase bg-je-blue/15 text-je-blue-navy px-1.5 py-0.5 rounded-full">
+                            Popular
+                          </span>
+                        )}
+                      </div>
+                      <p className="mt-1 text-[12px] text-je-grey-mid leading-relaxed line-clamp-2">
+                        {it.description}
+                      </p>
+                      <div className="mt-3">
+                        <span className="text-[14px] font-semibold tabular-nums">
+                          {formatPrice(it.pricePence)}
+                        </span>
                       </div>
                     </div>
                     <div className="size-[88px] shrink-0 rounded-[var(--r-md)] bg-gradient-to-br from-je-blue/10 to-je-tan relative overflow-hidden">

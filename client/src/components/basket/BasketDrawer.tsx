@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { Minus, Plus, Trash2, X } from "lucide-react";
 import { useBasket } from "@/lib/store/basket";
 import { formatPrice } from "@/lib/utils";
+import type { BasketLine } from "@/lib/data/types";
 
 export function BasketDrawer() {
   const isOpen = useBasket((s) => s.isOpen);
@@ -15,6 +16,8 @@ export function BasketDrawer() {
   const removeLine = useBasket((s) => s.removeLine);
   const clear = useBasket((s) => s.clear);
   const subtotal = useBasket((s) => s.subtotalPence());
+
+  const groups = useMemo(() => groupByRestaurant(lines), [lines]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -49,21 +52,10 @@ export function BasketDrawer() {
             transition={{ type: "spring", stiffness: 300, damping: 36 }}
           >
             <header className="flex items-center justify-between p-5 border-b border-line">
-              <div>
-                <div className="text-[10px] uppercase tracking-[0.18em] text-je-grey-mid font-semibold">
-                  Your basket
-                </div>
-                <h2 className="font-sans font-bold text-[22px] leading-none mt-1.5 tracking-[-0.02em]">
-                  {lines.length > 0 ? (
-                    <>
-                      {lines.length} {lines.length === 1 ? "item" : "items"}{" "}
-                      <span className="font-serif italic font-medium text-je-blue-dark">ready</span>
-                    </>
-                  ) : (
-                    <>It's <span className="font-serif italic font-medium text-je-blue-dark">empty</span></>
-                  )}
-                </h2>
-              </div>
+              <h2 className="font-sans font-bold text-[22px] leading-none tracking-[-0.02em]">
+                Your basket{" "}
+                <span className="text-je-grey-mid font-medium tabular-nums">({lines.length})</span>
+              </h2>
               <button
                 type="button"
                 onClick={close}
@@ -90,70 +82,82 @@ export function BasketDrawer() {
                   </Link>
                 </div>
               ) : (
-                <ul className="flex flex-col gap-3">
-                  {lines.map((l) => (
-                    <li
-                      key={l.lineId}
-                      className="rounded-[var(--r-md)] border border-line bg-white p-3.5"
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <div className="text-[10px] uppercase tracking-[0.16em] text-je-grey-mid font-semibold">
-                            {l.restaurantName}
-                          </div>
-                          <div className="font-sans font-semibold text-[15px] tracking-[-0.01em] mt-0.5">
-                            {l.itemName}
-                          </div>
-                          {l.modifierSelections.length > 0 && (
-                            <ul className="mt-1.5 flex flex-wrap gap-1">
-                              {l.modifierSelections.map((m) => (
-                                <li
-                                  key={m.optionId}
-                                  className="text-[11px] text-je-grey-mid px-2 py-0.5 rounded-full bg-je-off-white"
+                <div className="flex flex-col gap-6">
+                  {groups.map((g) => (
+                    <section key={g.slug} className="flex flex-col gap-3">
+                      <header className="flex items-baseline justify-between gap-3 px-0.5">
+                        <h3 className="font-sans font-bold text-[13px] tracking-[-0.01em]">
+                          {g.restaurantName}
+                        </h3>
+                        <span className="text-[10px] uppercase tracking-[0.16em] text-je-grey-mid font-semibold tabular-nums">
+                          {g.lines.length} {g.lines.length === 1 ? "item" : "items"}
+                        </span>
+                      </header>
+                      <ul className="flex flex-col gap-3">
+                        {g.lines.map((l) => (
+                          <li
+                            key={l.lineId}
+                            className="rounded-[var(--r-md)] border border-line bg-white p-3.5"
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="min-w-0">
+                                <div className="font-sans font-semibold text-[15px] tracking-[-0.01em]">
+                                  {l.itemName}
+                                </div>
+                                {l.modifierSelections.length > 0 && (
+                                  <ul className="mt-1.5 flex flex-wrap gap-1">
+                                    {l.modifierSelections.map((m) => (
+                                      <li
+                                        key={m.optionId}
+                                        className="text-[11px] text-je-grey-mid px-2 py-0.5 rounded-full bg-je-off-white"
+                                      >
+                                        {m.optionName}
+                                        {m.pricePence > 0 && ` +${formatPrice(m.pricePence)}`}
+                                      </li>
+                                    ))}
+                                  </ul>
+                                )}
+                              </div>
+                              <div className="text-right shrink-0">
+                                <div className="font-semibold text-[14px]">{formatPrice(l.totalPence)}</div>
+                              </div>
+                            </div>
+                            <div className="mt-3 flex items-center justify-between">
+                              <div className="inline-flex items-center rounded-full border border-line overflow-hidden">
+                                <button
+                                  type="button"
+                                  className="size-8 inline-flex items-center justify-center hover:bg-je-off-white disabled:opacity-40 disabled:hover:bg-transparent disabled:cursor-not-allowed"
+                                  onClick={() => updateQty(l.lineId, l.quantity - 1)}
+                                  disabled={l.quantity <= 1}
+                                  aria-label="Decrease"
                                 >
-                                  {m.optionName}
-                                  {m.pricePence > 0 && ` +${formatPrice(m.pricePence)}`}
-                                </li>
-                              ))}
-                            </ul>
-                          )}
-                        </div>
-                        <div className="text-right shrink-0">
-                          <div className="font-semibold text-[14px]">{formatPrice(l.totalPence)}</div>
-                        </div>
-                      </div>
-                      <div className="mt-3 flex items-center justify-between">
-                        <div className="inline-flex items-center rounded-full border border-line overflow-hidden">
-                          <button
-                            type="button"
-                            className="size-8 inline-flex items-center justify-center hover:bg-je-off-white"
-                            onClick={() => updateQty(l.lineId, l.quantity - 1)}
-                            aria-label="Decrease"
-                          >
-                            <Minus className="size-3.5" />
-                          </button>
-                          <span className="w-7 text-center text-[13px] font-semibold">{l.quantity}</span>
-                          <button
-                            type="button"
-                            className="size-8 inline-flex items-center justify-center hover:bg-je-off-white"
-                            onClick={() => updateQty(l.lineId, l.quantity + 1)}
-                            aria-label="Increase"
-                          >
-                            <Plus className="size-3.5" />
-                          </button>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => removeLine(l.lineId)}
-                          className="inline-flex items-center gap-1.5 text-[12px] text-je-grey-mid hover:text-je-coral transition-colors"
-                        >
-                          <Trash2 className="size-3.5" />
-                          Remove
-                        </button>
-                      </div>
-                    </li>
+                                  <Minus className="size-3.5" />
+                                </button>
+                                <span className="w-7 text-center text-[13px] font-semibold">{l.quantity}</span>
+                                <button
+                                  type="button"
+                                  className="size-8 inline-flex items-center justify-center hover:bg-je-off-white"
+                                  onClick={() => updateQty(l.lineId, l.quantity + 1)}
+                                  aria-label="Increase"
+                                >
+                                  <Plus className="size-3.5" />
+                                </button>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => removeLine(l.lineId)}
+                                className="inline-flex items-center gap-1.5 text-[12px] text-je-coral hover:text-je-coral/80 transition-colors"
+                              >
+                                <Trash2 className="size-3.5" />
+                                Remove
+                              </button>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </section>
                   ))}
-                </ul>
+                </div>
               )}
             </div>
 
@@ -187,4 +191,27 @@ export function BasketDrawer() {
       )}
     </AnimatePresence>
   );
+}
+
+type RestaurantGroup = {
+  slug: string;
+  restaurantName: string;
+  lines: BasketLine[];
+};
+
+function groupByRestaurant(lines: BasketLine[]): RestaurantGroup[] {
+  const bySlug = new Map<string, RestaurantGroup>();
+  for (const l of lines) {
+    const g = bySlug.get(l.restaurantSlug);
+    if (g) {
+      g.lines.push(l);
+    } else {
+      bySlug.set(l.restaurantSlug, {
+        slug: l.restaurantSlug,
+        restaurantName: l.restaurantName,
+        lines: [l],
+      });
+    }
+  }
+  return [...bySlug.values()];
 }
